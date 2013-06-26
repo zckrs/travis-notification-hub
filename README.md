@@ -1,7 +1,7 @@
 travis-notification-hub
 =======================
 
-A node.js/mogodb service that would serve as a middle-tier hub for dispatching notifications to Android and iOS applications
+A node.js/mongodb service that would serve as a middle-tier hub for dispatching notifications to Android and iOS applications
 
 
 ### Travis Notification Hub API
