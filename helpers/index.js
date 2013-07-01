@@ -1,5 +1,7 @@
-var extend = require('node.extend'),
+var debug = require('debug')('hub:helpers'),
+    extend = require('node.extend'),
     parseRequestData = function (requestBody) {
+      debug('requestBody: ', requestBody);
       var defaultDevice = { deviceid : '', repoid : ''};
       try {
         return  extend(defaultDevice, JSON.parse(requestBody.data));
