@@ -8,59 +8,50 @@ module.exports = function (app) {
     debug('Inside device.update...');
 
     var requestData = helpers.parseRequestData(req.body),
-        response = {
+        result = {
           status : '',
           device : {},
           error  : null
+        }, saveClosure = function (result, res) {
+          return function (err, saveddevice, operation) {
+            if (err) {
+              result.status = operation + 'Error';
+              result.error = err;
+              debug('ERROR: ', err);
+            } else {
+              result.device = saveddevice;
+              debug('Device after' + operation + ': ', saveddevice);
+            }
+            res.send(result);
+          };
         };
 
     if (helpers.validateDevice(req, requestData)) {
 
       new Device({ deviceId : requestData.deviceId}).findByDeviceId(function (err, devices) {
         if (err) {
-          response.status = 'Find Error';
-          response.error = err;
+          result.status = 'Find Error';
+          result.error = err;
           debug('ERROR: ', err);
-          res.send(response);
+          res.send(result);
         } else if (!devices.length) {
-          response.status = 'Registered a new device...';
-          debug(response.status);
+          result.status = 'Registered a new device...';
+          debug(result.status);
           var newDevice = extend(new Device({ deviceId : requestData.deviceId, created : Date.now() }), requestData);
-          newDevice.save(function (err, saveddevice) {
-            if (err) {
-              response.status = 'Insert Error';
-              response.error = err;
-              debug('ERROR: ', err);
-            } else {
-              response.device = saveddevice;
-              debug('New device saved: ', saveddevice);
-            }
-            res.send(response);
-          });
+          newDevice.save(saveClosure(result, res, 'Insert'));
         } else {
-          response.status = 'Found registered device...';
-          debug(response.status);
+          result.status = 'Found registered device...';
+          debug(result.status);
           if (devices.length !== 1) {
-            response.status = 'Multiple Devices error';
-            response.error = 'Found more than one device with deviceId: ' + requestData.deviceId;
-            response.device = devices;
+            result.status = 'Multiple Devices error';
+            result.error = 'Found more than one device with deviceId: ' + requestData.deviceId;
+            result.device = devices;
             debug('ERROR: Duplicate entries for deviceId %s. Devices are: ', requestData.deviceId, devices);
-            res.send(response);
+            res.send(result);
           } else {
-            var existingDevice = devices[0];
+            var existingDevice = extend(devices[0], requestData);
             existingDevice.updated = Date.now();
-            response.device = existingDevice;
-            existingDevice.save(function (err, device) {
-              if (err) {
-                response.status = 'Insert Error';
-                response.error = err;
-                debug('ERROR: ', err);
-              } else {
-                response.device = device;
-                debug('Device updated: ', device);
-              }
-              res.send(response);
-            });
+            existingDevice.save(saveClosure(result, res, 'Update'));
           }
         }
 
