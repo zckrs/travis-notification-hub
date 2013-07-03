@@ -1,39 +1,56 @@
 module.exports = function (app) {
 
-  var debug = require('debug')('hub:route:repos'),
-      helpers = require('../../../helpers');
+  var debug = require('debug')('hub:routes:repos'),
+      helpers = require('../../../helpers'),
+      Device = require('../../../models/device'),
+      sendInvalidRequestResponse = function(res, result){
+        result.status = result.error = helpers.INVALID_REQUEST_ERROR;
+        res.send(400, result);
+      };
 
   app.put('/api/devices/:deviceid/repos/:repoid', function (req, res) {
     debug('Inside PUT /api/devices/:deviceid/repos/:repoid');
-    var requestData = helpers.parseRequest(req.body);
-    if (helpers.validateDeviceRepo(req, requestData)) {
-      //TODO: add repo to repos collection for this device
-      res.send('Repository ' + req.params.repoid + ' has been subscribed for device ' + req.params.deviceid + '!');
+    var requestBody = req.body,
+        result = { status : '', device : null, error : null };
+
+    if (helpers.validateDeviceRepo(req, requestBody)) {
+
+      //new Device({ deviceId : requestBody.deviceId })
+
     } else {
-      res.send(helpers.INVALID_REQUEST_ERROR);
+      sendInvalidRequestResponse(res, result);
     }
+
   });
 
   app.delete('/api/devices/:deviceid/repos/:repoid', function (req, res) {
     debug('Inside DELETE /api/devices/:deviceid/repos/:repoid');
-    var requestData = helpers.parseRequest(req.body);
-    if (helpers.validateDeviceRepo(req, requestData)) {
+    var requestBody = req.body,
+        result = { status : '', device : null, error : null };
+
+    if (helpers.validateDeviceRepo(req, requestBody)) {
+
       //TODO: remove repo from repos collection for this device
-      res.send('Repository ' + req.params.repoid + ' has been unsubscribed for device ' + req.params.deviceid + '!');
+
     } else {
-      res.send(helpers.INVALID_REQUEST_ERROR);
+      sendInvalidRequestResponse(res, result);
     }
+
   });
 
   app.delete('/api/devices/:deviceid/repos', function (req, res) {
     debug('Inside DELETE /api/devices/:deviceid/repos');
-    var requestData = helpers.parseRequest(req.body);
-    if (helpers.validateDevice(req, requestData)) {
+    var requestBody = req.body,
+        result = { status : '', device : null, error : null };
+
+    if (helpers.validateDevice(req, requestBody)) {
+
       //TODO: remove all repos from repos collection for this device
-      res.send('All repositories have been unsubscribed for device ' + req.params.deviceid + '!');
+
     } else {
-      res.send(helpers.INVALID_REQUEST_ERROR);
+      sendInvalidRequestResponse(res, result);
     }
+
   });
 
 };

@@ -6,7 +6,6 @@ module.exports = function (app) {
 
   app.post('/api/notifications', function (req, res) {
     debug('Inside POST /api/notifications');
-    var requestData = helpers.parseRequest(req.body);
 
     //TODO: check if any device subscribes to the incoming repo and if yes, dispatch APNS/GCM notification
 

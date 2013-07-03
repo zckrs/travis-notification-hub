@@ -8,7 +8,7 @@ module.exports = function (app) {
 
     debug('Inside PUT /api/devices/:deviceid');
 
-    var requestBody = helpers.parseRequest(req.body),
+    var requestBody = req.body,
         saveClosure = function (result, res, operation) {
           return function (err, device) {
             if (err) {
