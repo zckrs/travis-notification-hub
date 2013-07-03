@@ -3,11 +3,11 @@ var debug = require('debug')('hub:helpers'),
 
 module.exports.INVALID_REQUEST_ERROR = 'Invalid request.';
 
-exports.parseRequestData = function (requestBody) {
+exports.parseRequest = function (requestBody) {
   debug('requestBody: ', requestBody);
   var defaultDevice = { deviceid : '', repoid : ''};
   try {
-    return  extend(defaultDevice, JSON.parse(requestBody.data));
+    return  extend(defaultDevice, requestBody);
   } catch (err) {
     console.log('Request Parse Error: ' + err);
     return defaultDevice;
