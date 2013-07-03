@@ -64,6 +64,7 @@ module.exports = function (app) {
                 }
               }); //end newRepo find
 
+              debug('Device %s subscribed to the repo %s', requestBody.deviceId, requestBody.repo.repoId);
               result.status = 'Repo Added';
               result.device = device;
               res.send(201, result);
@@ -72,6 +73,7 @@ module.exports = function (app) {
           }); //end device save
 
         } else {
+          debug('Device %s already subscribes to the repo %s', requestBody.deviceId, requestBody.repo.repoId);
           result.status = 'Device already subscribes to this repo.';
           result.device = device;
           res.send(result);
