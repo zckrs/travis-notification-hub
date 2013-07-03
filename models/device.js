@@ -3,8 +3,8 @@ var debug = require('debug')('hub:models:device'),
     deviceSchema = new mongoose.Schema({
                                          deviceId   : { type : String, unique : true, required : true },
                                          name       : String,
-                                         platform   : { type : String, required : true},
-                                         android    : {registrationId : String},
+                                         platform   : { type : String, required : true },
+                                         android    : { registrationId : String },
                                          iOS        : {
                                            pushBadge   : String,
                                            pushSound   : String,
@@ -13,7 +13,7 @@ var debug = require('debug')('hub:models:device'),
                                            deviceToken : String
                                          },
                                          repos      : [],
-                                         badgeCount : {type : Number, default : 0},
+                                         badgeCount : { type : Number, default : 0 },
                                          created    : Date,
                                          updated    : { type : Date, default : Date.now }
                                        });

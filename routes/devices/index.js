@@ -1,7 +1,7 @@
 module.exports = function (app) {
   var debug = require('debug')('hub:routes:devices'),
       helpers = require('../../helpers'),
-      extend = require('node.extend'),
+      extend = require ('node.extend'),
       Device = require('../../models/device');
 
   app.put('/api/devices/:deviceid', function (req, res) {
@@ -12,7 +12,7 @@ module.exports = function (app) {
         saveClosure = function (result, res, operation) {
           return function (err, device) {
             if (err) {
-              result.status = operation + ' Error';
+              result.status = operation + ' Device Error';
               result.error = err;
               debug('ERROR: ', err);
             } else {
@@ -35,11 +35,9 @@ module.exports = function (app) {
           debug('ERROR: ', err);
           res.send(500, result);
         } else if (!devices.length) {
-          debug(result.status);
           var newDevice = extend(new Device({ deviceId : requestBody.deviceId, created : Date.now() }), requestBody);
           newDevice.save(saveClosure(result, res, 'Insert'));
         } else {
-          debug(result.status);
           var existingDevice = extend(devices[0], requestBody);
           existingDevice.updated = Date.now();
           existingDevice.save(saveClosure(result, res, 'Update'));
