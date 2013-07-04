@@ -1,22 +1,22 @@
 var debug = require('debug')('hub:models:device'),
     mongoose = require('mongoose'),
     deviceSchema = new mongoose.Schema({
-      deviceId   : { type : String, unique : true, required : true },
-      name       : String,
-      platform   : { type : String, required : true },
-      android    : { registrationId : String },
-      iOS        : {
-        pushBadge   : String,
-        pushSound   : String,
-        pushAlert   : String,
-        enabled     : String,
-        deviceToken : String
-      },
-      repos      : [],
-      badgeCount : { type : Number, default : 0 },
-      created    : Date,
-      updated    : { type : Date, default : Date.now }
-    });
+                                         deviceId   : { type : String, unique : true, required : true },
+                                         name       : String,
+                                         platform   : { type : String, required : true },
+                                         android    : { registrationId : String },
+                                         iOS        : {
+                                           pushBadge   : String,
+                                           pushSound   : String,
+                                           pushAlert   : String,
+                                           enabled     : String,
+                                           deviceToken : String
+                                         },
+                                         repos      : [],
+                                         badgeCount : { type : Number, default : 0 },
+                                         created    : Date,
+                                         updated    : { type : Date, default : Date.now }
+                                       });
 
 deviceSchema.methods.findByDeviceId = function (callback) {
   debug('Inside models.device findDeviceById for deviceId: %s', this.deviceId);

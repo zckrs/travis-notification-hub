@@ -1,7 +1,7 @@
 module.exports = function (app) {
   var debug = require('debug')('hub:routes:devices'),
       helpers = require('../../helpers'),
-      extend = require ('node.extend'),
+      extend = require('node.extend'),
       Device = require('../../models/device');
 
   app.put('/api/devices/:deviceid', function (req, res) {
