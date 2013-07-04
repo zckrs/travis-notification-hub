@@ -23,11 +23,11 @@ module.exports = function (app) {
             res.send(err ? 500 : operation === 'Insert' ? 201 : 200, result);
           };
         },
-        result = { status : '', device : null, error : null };
+        result = helpers.initializeResult();
 
-    if (helpers.validateDevice(req, requestBody)) {
+    if (helpers.validateDevice(req)) {
 
-      new Device({ deviceId : requestBody.deviceId}).findByDeviceId(function (err, devices) {
+      Device.find({ deviceId : requestBody.deviceId}, function (err, devices) {
 
         if (err) {
           result.status = 'Find Error';
@@ -46,8 +46,7 @@ module.exports = function (app) {
       });
 
     } else {
-      result.status = result.error = helpers.INVALID_REQUEST_ERROR;
-      res.send(400, result);
+      helpers.sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
     }
 
   });

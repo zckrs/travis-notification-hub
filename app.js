@@ -1,18 +1,17 @@
-// architecture from this SO answer - http://stackoverflow.com/a/15572522 (thanks nevi_me!)
-process.env['DEBUG'] = 'hub:*, apn';
+if (require('./config').env === 'development') { process.env['DEBUG'] = 'hub:*'; }
 
-var db = require('./mongoose'),
+var debug = require('debug')('hub:app'),
     express = require('express'),
-    debug = require('debug')('hub:app');
-
-var app = express();
+    dbConnection = require('./mongoose'),
+    app = express();
 
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 
+debug('Database connection: ', dbConnection);
+
 debug('Setting up routes..')
 require('./routes')(app);
 
-debug('Begin listening on port 3000...');
 app.listen(3000);
 console.log('Listening on port 3000');

@@ -6,3 +6,5 @@ var mongoose = require('mongoose'),
       pass : config.mongo.pass
     };
 mongoose.connect(uri, options);
+
+module.exports = 'OK';

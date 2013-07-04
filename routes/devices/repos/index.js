@@ -5,18 +5,11 @@ module.exports = function (app) {
       extend = require('node.extend'),
       Device = require('../../../models/device'),
       Repo = require('../../../models/repo'),
-      sendErrorResponse = function (res, result, err, statusCode) {
-        if (err) {
-          result.error = err;
-        }
-        debug('Sending error response: ', err);
-        res.send(statusCode ? statusCode : 500, result);
-      },
       ensureDevice = function (res, result, deviceId, callback) {
         debug('Inside ensureDevice for deviceId: %s', deviceId);
-        new Device({ deviceId : deviceId }).findByDeviceId(function (err, devices) {
+        Device.find({ deviceId : deviceId }, function (err, devices) {
           if (err) {
-            sendErrorResponse(res, result, err);
+            helpers.sendErrorResponse(res, result, err);
           } else if (!devices.length) {
             result.status = result.error = 'Device not found';
             debug('ERROR: ', result.error);
@@ -25,66 +18,14 @@ module.exports = function (app) {
             callback(devices[0]);
           }
         });
-      },
-      unsubscribeRepo = function (device, repoId, callback) {
-        debug('Inside unsubscribeRepo repoId %s for device: ', repoId, device);
-        var result = { status : "", device : null, error : null};
-        if (!~device.repos.indexOf(repoId)) {  // device.repos does not have this repoId
-
-          debug('Device %s does not subscribe to the repo %s', device.deviceId, repoId);
-          result.status = 'Device does not subscribe to this repo.';
-          result.device = device;
-          callback(result);
-
-        } else { // device.repos has this repoId
-
-          //remove repoId from device.repos
-          device.repos.splice(device.repos.indexOf(repoId), 1);
-          device.updated = Date.now();
-          device.save(function (err, device) {
-            if (err) {
-              result.error = err;
-              callback(result);
-            } else {
-
-              //delete Repo document if this device was the last one subscribed to it - fire and forget
-              new Repo({ repoId : repoId }).findByRepoId(function (err, repos) {
-                if (err) { debug('Repo Find Error for repoId : %s', repoId); }
-                else if (!repos.length) { // for some reason the repo is missing ! Should not happen...
-                  debug('Repo document is missing for repoId: %s', repoId);
-                } else {  // if devicesSubscribed is 1, delete this repo, otherwise devicesSubscribed-- and update
-
-                  var repo = repos[0];
-                  if (repo.devicesSubscribed === 1) { // this was the only device subscribed to this repo
-                    Repo.remove(repo, function (err) {
-                      if (!err) { debug('Repo removed.'); }
-                    });
-                  } else { // there are other devices still subscribed to this repo
-                    debug('Repo still subscribed by some other device(s)');
-                    Repo.findOneAndUpdate(repo, { updated : Date.now(), devicesSubscribed : repo.devicesSubscribed - 1 }, function () {});
-                  }
-
-                }
-              }); //end newRepo find
-
-              debug('Device %s unsubscribed from the repo %s', device.deviceId, repoId);
-              result.status = 'Repo unsubscribed';
-              result.device = device;
-              callback(result);
-
-            }
-          }); //end device save
-
-        }
-
       };
 
   app.put('/api/devices/:deviceid/repos/:repoid', function (req, res) {
     debug('Inside PUT /api/devices/:deviceid/repos/:repoid');
     var requestBody = req.body,
-        result = { status : '', device : null, error : null };
+        result = helpers.initializeResult();
 
-    if (helpers.validateDeviceRepo(req, requestBody)) {
+    if (helpers.validateDeviceRepo(req)) {
 
       ensureDevice(res, result, requestBody.deviceId, function (device) {
 
@@ -95,14 +36,14 @@ module.exports = function (app) {
           device.updated = Date.now();
           device.save(function (err, device) {
             if (err) {
-              sendErrorResponse(res, result, err);
+              helpers.sendErrorResponse(res, result, err);
             } else {
 
               //insert Repo document if not exists - fire and forget
               debug('About to create or update the repo %s', requestBody.repo.repoId);
-              new Repo({ repoId : requestBody.repo.repoId }).findByRepoId(function (err, repos) {
+              Repo.find({ repoId : requestBody.repo.repoId }, function (err, repos) {
                 if (err) {
-                  sendErrorResponse(res, result, err);
+                  helpers.sendErrorResponse(res, result, err);
                 } else if (!repos.length) { // we haven't seen this repo before
 
                   var newRepo = extend(new Repo({ repoId : requestBody.repo.repoId, created : Date.now() }), requestBody.repo);
@@ -144,7 +85,7 @@ module.exports = function (app) {
       }); //end ensureDevice
 
     } else {
-      sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
+      helpers.sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
     }
 
   });
@@ -152,20 +93,20 @@ module.exports = function (app) {
   app.delete('/api/devices/:deviceid/repos/:repoid', function (req, res) {
     debug('Inside DELETE /api/devices/:deviceid/repos/:repoid');
     var requestBody = req.body,
-        result = { status : '', device : null, error : null };
+        result = helpers.initializeResult();
 
-    if (helpers.validateDeviceRepo(req, requestBody)) {
+    if (helpers.validateDeviceRepo(req)) {
 
       ensureDevice(res, result, requestBody.deviceId, function (device) {
 
-        unsubscribeRepo(device, requestBody.repo.repoId, function (result) {
+        helpers.unsubscribeRepo(device, requestBody.repo.repoId, function (result) {
           res.send(result.error ? 500 : 200, result);
         });
 
       });
 
     } else {
-      sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
+      helpers.sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
     }
 
   });
@@ -173,9 +114,9 @@ module.exports = function (app) {
   app.delete('/api/devices/:deviceid/repos', function (req, res) {
     debug('Inside DELETE /api/devices/:deviceid/repos');
     var requestBody = req.body,
-        result = { status : '', device : null, error : null };
+        result = helpers.initializeResult();
 
-    if (helpers.validateDevice(req, requestBody)) {
+    if (helpers.validateDevice(req)) {
 
       ensureDevice(res, result, requestBody.deviceId, function (device) {
 
@@ -187,9 +128,11 @@ module.exports = function (app) {
         if (reposCount) {
           debug('About to unsubscribe all repos: ', repos);
           repos.forEach(function (repoId) {
-            unsubscribeRepo(device, repoId, function (result) {
+
+            helpers.unsubscribeRepo(device, repoId, function (result) {
               processedReposCount++;
               resultsArray.push(result);
+
               debug('processedCount: %d and result: ', processedReposCount, result);
               if (reposCount === processedReposCount) {
                 //check all results are error free
@@ -203,7 +146,9 @@ module.exports = function (app) {
                   res.send(resultsArray[0]);
                 }
               }
+
             });
+
           });
         } else {
           debug('Device %s does not subscribe to any repos', device.deviceId);
@@ -215,7 +160,7 @@ module.exports = function (app) {
       });
 
     } else {
-      sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
+      helpers.sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
     }
 
   });

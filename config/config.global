@@ -7,3 +7,9 @@ config.hostname = 'localhost';
 config.mongo = {};
 config.mongo.uri = process.env.MONGO_URI || 'localhost';
 config.mongo.db = 'test';
+
+//apns
+config.apns = {};
+config.apns.gateway = "gateway.sandbox.push.apple.com";
+config.apns.cert = "./apns/cert/cert.pem";
+config.apns.key = "./apns/cert/key.pem";
