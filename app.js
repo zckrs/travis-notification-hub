@@ -1,4 +1,4 @@
-if (require('./config').env === 'development') { process.env['DEBUG'] = 'hub:*'; }
+if (require('./config').env === 'development') { process.env['DEBUG'] = 'hub:*, apn'; }
 
 var debug = require('debug')('hub:app'),
     express = require('express'),

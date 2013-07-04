@@ -39,6 +39,7 @@ module.exports = function (app) {
           newDevice.save(saveClosure(result, res, 'Insert'));
         } else {
           var existingDevice = extend(devices[0], requestBody);
+          existingDevice.badgeCount = 0;
           existingDevice.updated = Date.now();
           existingDevice.save(saveClosure(result, res, 'Update'));
         }

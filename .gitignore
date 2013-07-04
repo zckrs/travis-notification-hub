@@ -1,3 +1,9 @@
+config/config.development
+config/config.test
+config/config.production
+
 .DS_Store
+
 .idea
+
 *.pem
