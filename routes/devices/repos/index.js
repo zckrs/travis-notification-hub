@@ -177,7 +177,42 @@ module.exports = function (app) {
 
     if (helpers.validateDevice(req, requestBody)) {
 
-      //TODO: remove all repos from repos collection for this device
+      ensureDevice(res, result, requestBody.deviceId, function (device) {
+
+        var repos = device.repos.slice(0),
+            reposCount = repos.length,
+            processedReposCount = 0,
+            resultsArray = [];
+
+        if (reposCount) {
+          debug('About to unsubscribe all repos: ', repos);
+          repos.forEach(function (repoId) {
+            unsubscribeRepo(device, repoId, function (result) {
+              processedReposCount++;
+              resultsArray.push(result);
+              debug('processedCount: %d and result: ', processedReposCount, result);
+              if (reposCount === processedReposCount) {
+                //check all results are error free
+                var errors = resultsArray.filter(function (result) { return !!result.error; });
+                if (errors.length) {
+                  debug('Error: ', errors);
+                  res.send(500, errors);
+                } else {
+                  debug('Unsubscribed from all repos');
+                  resultsArray[0].status = 'Unsubscribed from all repos';
+                  res.send(resultsArray[0]);
+                }
+              }
+            });
+          });
+        } else {
+          debug('Device %s does not subscribe to any repos', device.deviceId);
+          result.status = 'Device does not subscribe to any repos';
+          result.device = device;
+          res.send(result);
+        }
+
+      });
 
     } else {
       sendErrorResponse(res, result, helpers.INVALID_REQUEST_ERROR, 400);
