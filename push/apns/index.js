@@ -7,7 +7,7 @@ exports.push = function (deviceToken, message, badgeNumber, payload) {
   debug('deviceToken    : ' + deviceToken);
   debug('message        : ' + message);
   debug('badgeNumber    : ' + badgeNumber);
-  debug('payload        : ', payload);
+  //debug('payload        : ', payload);
 
   var options = {
         "gateway" : config.apns.gateway,
@@ -18,15 +18,15 @@ exports.push = function (deviceToken, message, badgeNumber, payload) {
       device = new apn.Device(deviceToken),
       notification = new apn.Notification();
 
-  debug('apnConnection  : ', apnConnection);
-  debug('device         : ', device);
+  //debug('apnConnection  : ', apnConnection);
+  //debug('device         : ', device);
 
   notification.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   notification.badge = badgeNumber;
   notification.sound = "ping.aiff";
   notification.alert = message;
   notification.payload = payload;
-  debug('notification   : ', notification);
+  //debug('notification   : ', notification);
 
   apnConnection.pushNotification(notification, device);
 

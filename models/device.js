@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
                                          },
                                          repos      : [],
                                          badgeCount : { type : Number, default : 0 },
+                                         pushCount  : { type : Number, default : 0 },
                                          created    : Date,
                                          updated    : { type : Date, default : Date.now }
                                        });

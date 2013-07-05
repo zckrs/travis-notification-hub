@@ -46,7 +46,11 @@ module.exports = function (app) {
                   helpers.sendErrorResponse(res, result, err);
                 } else if (!repos.length) { // we haven't seen this repo before
 
-                  var newRepo = extend(new Repo({ repoId : requestBody.repo.repoId, created : Date.now() }), requestBody.repo);
+                  var newRepo = extend(new Repo({
+                                                  repoId            : requestBody.repo.repoId,
+                                                  devicesSubscribed : 1,
+                                                  created           : Date.now()
+                                                }), requestBody.repo);
                   newRepo.save(function (err, repo) {
                     if (!err) {
                       debug('Inserted new Repo: ', repo);
@@ -55,14 +59,11 @@ module.exports = function (app) {
 
                 } else {  // some other device has subscribed this repo before
 
-                  debug('Repo exists via some other device');
-                  Repo.findOneAndUpdate(repos[0], { updated : Date.now(), devicesSubscribed : repos[0].devicesSubscribed + 1 }, function (err, repo) {
-                    if (err) {
-                      debug('Error updating existing repo: ', err)
-                    } else {
-                      debug('Existing repo updated: ', repo)
-                    }
-                  });
+                  debug('Increment devicesSubscribed count on repo');
+                  Repo.findOneAndUpdate(repos[0], {
+                    updated           : Date.now(),
+                    devicesSubscribed : repos[0].devicesSubscribed + 1
+                  }, function () {});
 
                 }
               }); //end newRepo find

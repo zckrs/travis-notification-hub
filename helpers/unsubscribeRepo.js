@@ -31,15 +31,11 @@ module.exports = function (device, repoId, callback) {
             debug('Repo document is missing for repoId: %s', repoId);
           } else {  // if devicesSubscribed is 1, delete this repo, otherwise devicesSubscribed-- and update
 
-            var repo = repos[0];
-            if (repo.devicesSubscribed === 1) { // this was the only device subscribed to this repo
-              Repo.remove(repo, function (err) {
-                if (!err) { debug('Repo removed.'); }
-              });
-            } else { // there are other devices still subscribed to this repo
-              debug('Repo still subscribed by some other device(s)');
-              Repo.findOneAndUpdate(repo, { updated : Date.now(), devicesSubscribed : repo.devicesSubscribed - 1 }, function () {});
-            }
+            debug('Decrement devicesSubscribed count on repo');
+            Repo.findOneAndUpdate(repos[0], {
+              updated           : Date.now(),
+              devicesSubscribed : repos[0].devicesSubscribed - 1
+            }, function () {});
 
           }
         }); //end newRepo find

@@ -19,6 +19,14 @@ exports.notify = function (build, callback) {
       debug('Devices find error for repoId %s : ', repoId, err);
       callback(500, 'Internal Server Error');
     } else {
+
+      if (!devices.length) {
+        var noOneSubscribedMessage = util.format('No devices subscribe for build notifications for repo: %s', repoId);
+        debug(noOneSubscribedMessage);
+        callback(200, noOneSubscribedMessage);
+        return;
+      }
+
       // respond back to the notifications POST request
       callback(200, util.format('Pushing build notifications for repo %s to %d devices', repoId, devices.length));
 
@@ -33,15 +41,21 @@ exports.notify = function (build, callback) {
         } else {
           if (device.iOS.enabled === '1') {
             apnDevices.push({ deviceToken : device.iOS.deviceToken, badge : newBadgeCount });
+          } else {
+            return; // do not update the device
           }
         }
-        Device.findOneAndUpdate(device, {badgeCount : newBadgeCount, updated : Date.now()}, function () {});
+        Device.findOneAndUpdate(device, {
+          badgeCount : newBadgeCount,
+          pushCount  : device.pushCount + 1,
+          updated    : Date.now()
+        }, function () {});
       });
 
       //debug('gcmDevices : ', gcmDevices);
       //debug('apnDevices : ', apnDevices);
 
-      Repo.find({ repoId : repoId}, function (err, repos) {
+      Repo.find({ repoId : repoId }, function (err, repos) {
         if (err) {
           debug('Repo find error for repoId %s : ', repoId, err);
         } else {
@@ -58,8 +72,13 @@ exports.notify = function (build, callback) {
 
           debug('Pushing message: \'' + pushMessage + '\' to %d GCM and %d APN devices', gcmDevices.length, apnDevices.length);
 
-          // Update repo with this build status; TODO: Add notification analytics
-          Repo.findOneAndUpdate(repo, { lastBuildFailed : currentBuildFailed, updated : Date.now() }, function () {});
+          // Update repo with this build status, gcmPushCount and apnPushCount
+          Repo.findOneAndUpdate(repo, {
+            updated         : Date.now(),
+            lastBuildFailed : currentBuildFailed,
+            gcmPushCount    : repo.gcmPushCount + gcmDevices.length,
+            apnPushCount    : repo.apnPushCount + apnDevices.length
+          }, function () {});
 
           gcmDevices.forEach(function (gcmDevice) {
             gcms.push(gcmDevice.regId, pushMessage, gcmDevice.badge, pushPayload);

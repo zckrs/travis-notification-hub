@@ -2,8 +2,8 @@ config/config.development
 config/config.test
 config/config.production
 
+*.pem
+
 .DS_Store
 
 .idea
-
-*.pem

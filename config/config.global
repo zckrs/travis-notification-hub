@@ -10,10 +10,10 @@ config.mongo.db = 'test';
 
 //gcms
 config.gcms = {};
-config.gcms.senderId = '';
+config.gcms.senderId = 'GCM API Key from Google Developer Console';
 
 //apns
 config.apns = {};
 config.apns.gateway = "gateway.sandbox.push.apple.com";
-config.apns.cert = "relative-path-to/cert.pem";
-config.apns.key = "relative-path-to/key.pem";
+config.apns.cert = "relative-path-to/cert.pem that is the APN SSL certificate from Apple Developer Console";
+config.apns.key = "relative-path-to/key.pem that is the private key for the APN SSL certificate from Apple Developer Console";
