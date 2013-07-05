@@ -1,6 +1,6 @@
 {
   "name"         : "travis-notification-hub",
-  "description"  : "A node/mongoose service that would serve as a middle-tier hub for dispatching build notifications to Android and iOS applications.",
+  "description"  : "A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.",
   "version"      : "0.0.1-1",
   "private"      : true,
   "dependencies" : {
