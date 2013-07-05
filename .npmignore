@@ -1,9 +1,8 @@
 config/config.development
 config/config.test
-config/config.staging
-config/config.production
+!config/config.staging
 
-*.pem
+!*.pem
 
 .DS_Store
 .idea

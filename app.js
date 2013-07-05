@@ -21,9 +21,9 @@ var start = function () {
   console.log('Listening on port 3000');
 }
 
-if (require('./config').env === 'development') {
+exports.app = app;
+exports.start = start;
+
+if (require('./config').env !== 'test') {
   start();
-} else {
-  exports.app = app;
-  exports.start = start;
 }
