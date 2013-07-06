@@ -84,3 +84,7 @@ The request payload will have build status and the repo identifier and name:
   "name"        : "Name of the repo (egs. floydpink/travis-notification-hub)"
 }
 ```
+
+### Tests
+
+Run the tests using `npm test`

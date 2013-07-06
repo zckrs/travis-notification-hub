@@ -11,5 +11,10 @@
   "boss"    : true,
   "eqnull"  : true,
   "asi"     : true,
-  "node"    : true
+  "node"    : true,
+  "globals" : {
+    "describe" : false,
+    "before"   : false,
+    "it"       : false
+  }
 }

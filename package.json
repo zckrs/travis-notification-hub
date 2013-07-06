@@ -1,9 +1,9 @@
 {
-  "name"         : "travis-notification-hub",
-  "description"  : "A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.",
-  "version"      : "0.0.1-1",
-  "private"      : true,
-  "dependencies" : {
+  "name"            : "travis-notification-hub",
+  "description"     : "A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.",
+  "version"         : "0.0.1-1",
+  "private"         : true,
+  "dependencies"    : {
     "express"     : "~3.2.6",
     "mongoose"    : "~3.6.13",
     "node.extend" : "~1.0.7",
@@ -11,11 +11,21 @@
     "debug"       : "~0.7.2",
     "node-gcm"    : "~0.9.6"
   },
-  "subdomain"    : "travis-hub",
-  "scripts"      : {
-    "start" : "node app.js"
+  "devDependencies" : {
+    "mocha"     : "0.3.x",
+    "should"    : "~1.2.2",
+    "supertest" : "~0.7.1"
   },
-  "engines"      : {
+  "repository"      : {
+    "type" : "git",
+    "url"  : "https://github.com/floydpink/travis-notification-hub.git"
+  },
+  "scripts"         : {
+    "start" : "node app.js",
+    "test" : "NODE_ENV=test make test"
+  },
+  "subdomain"       : "travis-hub",
+  "engines"         : {
     "node" : "0.8.x"
   }
 }

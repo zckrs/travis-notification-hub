@@ -2,6 +2,7 @@ var config = module.exports = {};
 
 config.env = 'development';
 config.hostname = 'localhost';
+config.port = process.env.PORT || 3000;
 
 //mongo database
 config.mongo = {};

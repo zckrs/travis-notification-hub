@@ -1,3 +1,4 @@
+console.log('NODE_ENV: %s', process.env.NODE_ENV);
 var env = process.env.NODE_ENV || 'development',
     config = require('./config.' + env);
 
