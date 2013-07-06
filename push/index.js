@@ -74,10 +74,11 @@ exports.notify = function (build, callback) {
 
           // Update repo with this build status, gcmPushCount and apnPushCount
           Repo.findOneAndUpdate(repo, {
-            updated         : Date.now(),
-            lastBuildFailed : currentBuildFailed,
-            gcmPushCount    : repo.gcmPushCount + gcmDevices.length,
-            apnPushCount    : repo.apnPushCount + apnDevices.length
+            updated           : Date.now(),
+            lastBuildFinished : Date.now(),
+            lastBuildFailed   : currentBuildFailed,
+            gcmPushCount      : repo.gcmPushCount + gcmDevices.length,
+            apnPushCount      : repo.apnPushCount + apnDevices.length
           }, function () {});
 
           gcmDevices.forEach(function (gcmDevice) {

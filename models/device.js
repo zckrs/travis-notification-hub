@@ -1,15 +1,17 @@
 var mongoose = require('mongoose'),
     deviceSchema = new mongoose.Schema({
                                          deviceId   : { type : String, unique : true, required : true },
-                                         name       : String,
+                                         name       : { type : String, default : '' },
                                          platform   : { type : String, required : true },
-                                         android    : { registrationId : String },
+                                         android    : {
+                                           registrationId : { type : String, default : '' }
+                                         },
                                          iOS        : {
-                                           pushBadge   : String,
-                                           pushSound   : String,
-                                           pushAlert   : String,
-                                           enabled     : String,
-                                           deviceToken : String
+                                           pushBadge   : { type : String, default : '' },
+                                           pushSound   : { type : String, default : '' },
+                                           pushAlert   : { type : String, default : '' },
+                                           enabled     : { type : String, default : '' },
+                                           deviceToken : { type : String, default : '' }
                                          },
                                          repos      : [],
                                          badgeCount : { type : Number, default : 0 },
