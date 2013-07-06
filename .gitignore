@@ -1,5 +1,4 @@
 config/config.development
-config/config.test
 config/config.staging
 config/config.production
 

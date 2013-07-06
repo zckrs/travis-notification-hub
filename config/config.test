@@ -1,0 +1,8 @@
+var config = require('./config.global');
+
+config.env = 'test';
+config.hostname = 'localhost';
+
+config.mongo.db = 'travis-hub-test';
+
+module.exports = config;
