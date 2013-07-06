@@ -6,13 +6,14 @@ var debug = require('debug')('hub:app'),
     mongoose = require('./mongoose'),
     app = express();
 
-app.configure(function () {
+app.configure('development', function () {
   app.use(express.logger('dev'));
-  app.use(express.bodyParser());
 });
 
+app.use(express.bodyParser());
+
 debug('Connecting to database connection...');
-mongoose.connect();
+var connection = mongoose.connect();
 
 var start = function () {
   debug('Setting up routes..')
@@ -23,6 +24,9 @@ var start = function () {
 }
 
 exports.app = app;
+exports.connection = connection;
 exports.start = start;
 
-start();
+if (config.env !== 'test') {
+  start();
+}

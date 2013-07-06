@@ -8,4 +8,5 @@ exports.connect = function () {
       };
 
   mongoose.connect(uri, options);
+  return mongoose.connection;
 };
