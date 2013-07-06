@@ -39,6 +39,12 @@ describe('hub tests: ', function () {
           }
         });
       },
+      createDeviceRepoPayload = function (device, repo) {
+        return {
+          deviceId : device.deviceId,
+          repo     : repo
+        };
+      },
       iOSEnabledDevice01 = {
         "deviceId" : "Device01",
         "name"     : "iOS Device 01",
@@ -95,6 +101,18 @@ describe('hub tests: ', function () {
         "deviceId" : "Device06",
         "name"     : "Android Device 06",
         "platform" : "Android"
+      },
+      repo01 = {
+        "repoId" : "Repo001",
+        "name"   : "floydpink/travis-notification-hub"
+      },
+      repo02 = {
+        "repoId" : "Repo002",
+        "name"   : "floydpink/Travis-CI"
+      },
+      repo03 = {
+        "repoId" : "Repo003",
+        "name"   : "floydpink/Travis-CI-iOS"
       };
 
   before(function (done) {
@@ -186,7 +204,7 @@ describe('hub tests: ', function () {
       });
     });
     describe('\'/api/devices/:deviceId\' without platform in payload', function () {
-      it('should return throw error (500)', function (done) {
+      it('should throw error (500)', function (done) {
         request(url).
             put('/api/devices/DeviceAB').
             send({ "deviceId" : "DeviceAB"}).
@@ -363,7 +381,7 @@ describe('hub tests: ', function () {
   });
 
   describe('Database now: ', function () {
-    describe('devices', function () {
+    describe('devices collection', function () {
       it('should have the 6 test devices', function (done) {
         findAllDevices(function (devices) {
           devices.length.should.be.eql(6);
@@ -371,7 +389,7 @@ describe('hub tests: ', function () {
         });
       });
     });
-    describe('repos', function () {
+    describe('repos collection', function () {
       it('should still be empty', function (done) {
         findAllRepos(function (repos) {
           repos.length.should.be.eql(0);
@@ -410,15 +428,13 @@ describe('hub tests: ', function () {
         });
       });
     });
-    describe('devices', function () {
+    describe('devices collection', function () {
       it('should all have pushCount of 0', function (done) {
         findDevice({ pushCount : '0' }, function (devices) {
           devices.length.should.be.eql(6);
           done();
         });
       });
-    });
-    describe('devices', function () {
       it('should all have badgeCount of 0', function (done) {
         findDevice({ badgeCount : '0' }, function (devices) {
           devices.length.should.be.eql(6);
@@ -426,6 +442,182 @@ describe('hub tests: ', function () {
         });
       });
     });
+  });
+
+  describe('Repos: put', function () {
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with empty payload', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            put('/api/devices/Device01/repos/123456').
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with incorrect payload', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            put('/api/devices/Device01/repos/somerepoId').
+            send(createDeviceRepoPayload(iOSEnabledDevice01, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' without repo in payload', function () {
+      it('should throw error (500)', function (done) {
+        request(url).
+            put('/api/devices/Device01/repos/somerepoId').
+            send(iOSEnabledDevice01).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(500);
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device01 and repo01', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device01/repos/Repo001').
+            send(createDeviceRepoPayload(iOSEnabledDevice01, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device01');
+                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device02 and repo01', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device02/repos/Repo001').
+            send(createDeviceRepoPayload(iOSEnabledDevice02, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device02');
+                  res.body.device.name.should.be.eql('iOS Device 02');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device03 and repo01', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device03/repos/Repo001').
+            send(createDeviceRepoPayload(iOSDisabledDevice, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device03');
+                  res.body.device.name.should.be.eql('iOS Device 03');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device04 and repo01', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device04/repos/Repo001').
+            send(createDeviceRepoPayload(androidDevice01, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device04');
+                  res.body.device.name.should.be.eql('Android Device 04');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device05 and repo01', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device05/repos/Repo001').
+            send(createDeviceRepoPayload(androidDevice02, repo01)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device05');
+                  res.body.device.name.should.be.eql('Android Device 05');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device04 and repo02', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device04/repos/Repo002').
+            send(createDeviceRepoPayload(androidDevice01, repo02)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device04');
+                  res.body.device.name.should.be.eql('Android Device 04');
+                  res.body.device.repos.length.should.be.eql(2);
+                  res.body.device.repos.should.include('Repo001');
+                  res.body.device.repos.should.include('Repo002');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/devices/:deviceId/repos/:repoId\' with Device06 and repo02', function () {
+      it('should create repo successfully (201)', function (done) {
+        request(url).
+            put('/api/devices/Device06/repos/Repo002').
+            send(createDeviceRepoPayload(androidDevice03, repo02)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.device.deviceId.should.be.eql('Device06');
+                  res.body.device.name.should.be.eql('Android Device 06');
+                  res.body.device.repos.length.should.be.eql(1);
+                  res.body.device.repos.should.include('Repo002');
+                  done();
+                });
+      });
+    });
+  });
+
+  describe('Database now: ', function () {
+    describe('devices collection', function () {
+      it('should still have the 6 test devices', function (done) {
+        findAllDevices(function (devices) {
+          devices.length.should.be.eql(6);
+          done();
+        });
+      });
+    });
+    describe('repos collection', function () {
+      it('should now have the 2 test repos', function (done) {
+        findAllRepos(function (repos) {
+          repos.length.should.be.eql(2);
+          done();
+        });
+      });
+    });
+    //describe('Repo001')
+
   });
 
 });
