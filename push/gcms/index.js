@@ -4,9 +4,9 @@ var gcm = require('node-gcm'),
 
 exports.push = function (registrationId, message, badgeNumber, payload) {
   debug('Inside push...');
-  debug('registrationId : ', registrationId);
-  debug('message        : ', message);
-  debug('badgeNumber    : ', badgeNumber);
+  debug('registrationId : %s', registrationId);
+  debug('message        : %s', message);
+  debug('badgeNumber    : %d', badgeNumber);
   debug('payload        : ', payload);
 
   var sender = new gcm.Sender(config.gcms.senderId),

@@ -1,6 +1,32 @@
 var config = require('../config'),
     util = require('util'),
-    app = require('../app'),
+    proxyquire = require('proxyquire'),
+    gcmNotifications = [],
+    apnNotifications = [],
+    gcmPushMock = function (registrationId, message, badgeNumber, payload) {
+      gcmNotifications.push({
+                              registrationId : registrationId,
+                              message        : message,
+                              badgeNumber    : badgeNumber,
+                              payload        : payload
+                            });
+    },
+    apnPushMock = function (deviceToken, message, badgeNumber, payload) {
+      apnNotifications.push({
+                              deviceToken : deviceToken,
+                              message     : message,
+                              badgeNumber : badgeNumber,
+                              payload     : payload
+                            });
+    },
+    push = proxyquire('../push',
+                      {
+                        './gcms' : { push : gcmPushMock },
+                        './apns' : { push : apnPushMock }
+                      }),
+    notifications = proxyquire('../routes/notifications', { '../../push' : push }),
+    routes = proxyquire('../routes', {'./notifications' : notifications }),
+    app = proxyquire('../app', {'./routes' : routes }),
     Device = require('../models/device'),
     Repo = require('../models/repo'),
     request = require('supertest');
@@ -130,7 +156,7 @@ describe('hub tests: ', function () {
     });
   });
 
-  describe('API: ', function () {
+  describe('Routes: API: ', function () {
     describe('get \'/\'', function () {
       it('should return 404', function (done) {
         request(url).
@@ -156,7 +182,7 @@ describe('hub tests: ', function () {
     });
   });
 
-  describe('Database at startup: ', function () {
+  describe('Database: At startup: ', function () {
     describe('devices', function () {
       it('should be empty', function (done) {
         findAllDevices(function (devices) {
@@ -175,7 +201,7 @@ describe('hub tests: ', function () {
     });
   });
 
-  describe('Devices: put', function () {
+  describe('Routes: Devices: put', function () {
     describe('\'/api/devices/:deviceId\' with empty payload', function () {
       it('should return bad request (400)', function (done) {
         request(url).
@@ -380,7 +406,7 @@ describe('hub tests: ', function () {
 
   });
 
-  describe('Database now: ', function () {
+  describe('Database: Now: ', function () {
     describe('devices collection', function () {
       it('should have the 6 test devices', function (done) {
         findAllDevices(function (devices) {
@@ -444,7 +470,7 @@ describe('hub tests: ', function () {
     });
   });
 
-  describe('Repos: put', function () {
+  describe('Routes: Repos: put', function () {
     describe('\'/api/devices/:deviceId/repos/:repoId\' with empty payload', function () {
       it('should return bad request (400)', function (done) {
         request(url).
@@ -599,7 +625,7 @@ describe('hub tests: ', function () {
     });
   });
 
-  describe('Database now: ', function () {
+  describe('Database: Now: ', function () {
     describe('devices collection', function () {
       it('should still have the 6 test devices', function (done) {
         findAllDevices(function (devices) {
@@ -616,8 +642,159 @@ describe('hub tests: ', function () {
         });
       });
     });
-    //describe('Repo001')
+    describe('Repo001', function () {
+      it('should have been updated with the right values', function (done) {
+        findRepo(repo01, function (repos) {
+          repos.length.should.be.eql(1);
+          repos[0].repoId.should.be.eql('Repo001');
+          repos[0].name.should.be.eql('floydpink/travis-notification-hub');
+          repos[0].devicesSubscribed.should.be.eql(5);
+          repos[0].apnPushCount.should.be.eql(0);
+          repos[0].gcmPushCount.should.be.eql(0);
+          done();
+        });
+      });
+    });
+    describe('Repo002', function () {
+      it('should have been updated with the right values', function (done) {
+        findRepo(repo02, function (repos) {
+          repos.length.should.be.eql(1);
+          repos[0].repoId.should.be.eql('Repo002');
+          repos[0].name.should.be.eql('floydpink/Travis-CI');
+          repos[0].devicesSubscribed.should.be.eql(2);
+          repos[0].apnPushCount.should.be.eql(0);
+          repos[0].gcmPushCount.should.be.eql(0);
+          done();
+        });
+      });
+    });
+    describe('Repo003', function () {
+      it('should not be present', function (done) {
+        findRepo(repo03, function (repos) {
+          repos.length.should.be.eql(0);
+          done();
+        });
+      });
+    });
 
+  });
+
+  describe('Routes: Notifications: post', function () {
+    describe('\'/api/notifications\' with empty payload', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            post('/api/notifications').
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with incorrect payload', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({}).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with \'repoId\' missing', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({ "buildFailed" : false }).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with \'buildFailed\' missing', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({ "repoId" : "Repo001" }).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with non-boolean \'buildFailed\'', function () {
+      it('should return bad request (400)', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({ "repoId" : "Repo001", buildFailed : "false" }).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(400);
+                  res.body.error.should.include('Invalid Request');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with non-existent \'repoId\'', function () {
+      it('should complete successfully (200) with appropriate status', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({ "repoId" : "Repo008", buildFailed : false }).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(200);
+                  res.body.status.should.include('No devices subscribe for build notifications for repo: ');
+                  done();
+                });
+      });
+    });
+    describe('\'/api/notifications\' with \'repoId\' Repo001', function () {
+      it('should complete successfully (200) with calls to gcm and apn', function (done) {
+        request(url).
+            post('/api/notifications').
+            send({ "repoId" : "Repo001", buildFailed : false }).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.be.json;
+                  res.should.have.status(200);
+                  res.body.status.should.include('Pushed build notifications for repo Repo001 to 2 Android and 2 iOS devices');
+                  gcmNotifications.length.should.be.eql(2);
+                  apnNotifications.length.should.be.eql(2);
+                  gcmNotifications[0].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000005');
+                  gcmNotifications[1].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000004');
+                  gcmNotifications[0].message.should.eql('Build passed: floydpink/travis-notification-hub');
+                  gcmNotifications[1].message.should.eql('Build passed: floydpink/travis-notification-hub');
+                  gcmNotifications[0].badgeNumber.should.eql(1);
+                  gcmNotifications[1].badgeNumber.should.eql(1);
+                  gcmNotifications[0].payload.should.eql({ repoId : 'Repo001'});
+                  gcmNotifications[1].payload.should.eql({ repoId : 'Repo001'});
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
+                  apnNotifications[1].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000002');
+                  apnNotifications[0].message.should.eql('Build passed: floydpink/travis-notification-hub');
+                  apnNotifications[1].message.should.eql('Build passed: floydpink/travis-notification-hub');
+                  apnNotifications[0].badgeNumber.should.eql(1);
+                  apnNotifications[1].badgeNumber.should.eql(1);
+                  apnNotifications[0].payload.should.eql({ repoId : 'Repo001'});
+                  apnNotifications[1].payload.should.eql({ repoId : 'Repo001'});
+                  done();
+                });
+      });
+    });
   });
 
 });

@@ -27,10 +27,6 @@ exports.notify = function (build, callback) {
         return;
       }
 
-      // respond back to the notifications POST request
-      callback(200, util.format('Pushing build notifications for repo %s to %d devices', repoId, devices.length));
-
-      //and continue doing things after that
       debug('Found %d devices subscribed to repoId %s', devices.length, repoId);
       //debug('They are: ', devices);
 
@@ -88,6 +84,11 @@ exports.notify = function (build, callback) {
           apnDevices.forEach(function (apnDevice) {
             apns.push(apnDevice.deviceToken, pushMessage, apnDevice.badge, pushPayload);
           });
+
+          // respond back to the notifications POST request
+          callback(200, util.format('Pushed build notifications for repo %s to %d Android and %d iOS devices',
+                                    repoId, gcmDevices.length, apnDevices.length));
+
         }
       });
 

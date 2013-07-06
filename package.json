@@ -12,9 +12,10 @@
     "node-gcm"    : "~0.9.6"
   },
   "devDependencies" : {
-    "mocha"     : "0.3.x",
-    "should"    : "~1.2.2",
-    "supertest" : "~0.7.1"
+    "mocha"      : "0.3.x",
+    "should"     : "~1.2.2",
+    "supertest"  : "~0.7.1",
+    "proxyquire" : "~0.4.1"
   },
   "repository"      : {
     "type" : "git",

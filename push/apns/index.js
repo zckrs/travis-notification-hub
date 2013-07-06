@@ -4,9 +4,9 @@ var apn = require('apn'),
 
 exports.push = function (deviceToken, message, badgeNumber, payload) {
 
-  debug('deviceToken    : ' + deviceToken);
-  debug('message        : ' + message);
-  debug('badgeNumber    : ' + badgeNumber);
+  debug('deviceToken    : %s', deviceToken);
+  debug('message        : %s', message);
+  debug('badgeNumber    : %d', badgeNumber);
   //debug('payload        : ', payload);
 
   var options = {

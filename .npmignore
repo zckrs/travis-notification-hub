@@ -2,7 +2,9 @@ config/config.development
 config/config.test
 !config/config.staging
 
-!*.pem
+!push/apns/cert/*.pem
+
+test/
 
 .DS_Store
 .idea
