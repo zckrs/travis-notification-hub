@@ -89,3 +89,9 @@ The request payload will have build status and the repo identifier and name:
 ### Tests
 
 Run the tests using `npm test`
+
+
+
+Just so I could earn some bragging rights, please endorse me on coderwall!
+
+[![endorse](https://api.coderwall.com/floydpink/endorsecount.png)](https://coderwall.com/floydpink)
