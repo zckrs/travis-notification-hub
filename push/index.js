@@ -41,11 +41,10 @@ exports.notify = function (build, callback) {
             return; // do not update the device
           }
         }
-        Device.findOneAndUpdate(device, {
-          badgeCount : newBadgeCount,
-          pushCount  : device.pushCount + 1,
-          updated    : Date.now()
-        }, function () {});
+        device.badgeCount = newBadgeCount;
+        device.pushCount = device.pushCount + 1;
+        device.updated = Date.now();
+        device.save(function () { });
       });
 
       //debug('gcmDevices : ', gcmDevices);

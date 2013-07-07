@@ -51,11 +51,7 @@ module.exports = function (app) {
                                                   devicesSubscribed : 1,
                                                   created           : Date.now()
                                                 }), requestBody.repo);
-                  newRepo.save(function (err, repo) {
-                    if (!err) {
-                      debug('Inserted new Repo: ', repo);
-                    }
-                  }); //end newRepo save
+                  newRepo.save(function () { });
 
                 } else {  // some other device has subscribed this repo before
 
@@ -134,7 +130,7 @@ module.exports = function (app) {
               processedReposCount++;
               resultsArray.push(result);
 
-              debug('processedCount: %d and result: ', processedReposCount, result);
+              debug('processedCount: %d', processedReposCount);
               if (reposCount === processedReposCount) {
                 //check all results are error free
                 var errors = resultsArray.filter(function (result) { return !!result.error; });

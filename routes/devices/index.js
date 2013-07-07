@@ -18,7 +18,7 @@ module.exports = function (app) {
             } else {
               result.status = operation === 'Insert' ? 'Registered new device' : 'Updated existing device';
               result.device = device;
-              debug('Device after ' + operation + ': ', device);
+              //debug('Device after ' + operation + ': ', device);
             }
             res.send(err ? 500 : operation === 'Insert' ? 201 : 200, result);
           };

@@ -3,7 +3,7 @@ module.exports = function (device, repoId, callback) {
       helpers = require('./'),
       Repo = require('../models/repo');
 
-  debug('Inside unsubscribeRepo repoId %s for device: ', repoId, device);
+  debug('Inside unsubscribeRepo');
   var result = helpers.initializeResult();
   if (!~device.repos.indexOf(repoId)) {  // device.repos does not have this repoId
 
