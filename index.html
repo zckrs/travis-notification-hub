@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Notification Hub by floydpink</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/floydpink/travis-notification-hub">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/floydpink/travis-notification-hub/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/floydpink/travis-notification-hub/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Notification Hub</h1>
+          <p>Pushes the build notifications to the Travis-CI Mobile apps</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/floydpink">floydpink</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="travis-notification-hub" class="anchor" href="#travis-notification-hub"><span class="octicon octicon-link"></span></a>travis-notification-hub</h1>
+
+<p>A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.</p>
+
+<p><a href="https://travis-ci.org/floydpink/travis-notification-hub"><img src="https://travis-ci.org/floydpink/travis-notification-hub.png?branch=master" alt="Build Status"></a></p>
+
+<h3>
+<a name="travis-notification-hub-api" class="anchor" href="#travis-notification-hub-api"><span class="octicon octicon-link"></span></a>Travis Notification Hub API</h3>
+
+<h5>
+<a name="devices" class="anchor" href="#devices"><span class="octicon octicon-link"></span></a>Devices</h5>
+
+<p>A device that has the mobile client with a uniquely identifiable <code>deviceId</code></p>
+
+<p><code>PUT /devices/:deviceId</code></p>
+
+<ul>
+<li>Create or update the device with <code>deviceId</code> along with APNS or GCM unique identifier</li>
+</ul><p>The request payload for device (where either <code>iOS</code> or <code>android</code> has to be populated to match <code>platform</code> value:</p>
+
+<pre><code>{
+  "deviceId" : "Unique identifier",
+  "name"     : "Friendly name",
+  "platform" : "iOS | Android",
+  "iOS"      : {
+    "pushBadge"   : "0 | 1",
+    "pushSound"   : "0 | 1",
+    "pushAlert"   : "0 | 1",
+    "enabled"     : "0 | 1",
+    "deviceToken" : "APNS device token"
+  },
+  "android"  : {
+    "registrationId" : "GCM registration id"
+  }
+}
+</code></pre>
+
+<h4>
+<a name="repositories" class="anchor" href="#repositories"><span class="octicon octicon-link"></span></a>Repositories</h4>
+
+<p>A collection of GitHub repositories with Travis-CI builds that a device could subscribe to for notifications</p>
+
+<p><code>PUT /devices/:deviceId/repos/:repoId</code></p>
+
+<ul>
+<li>Subscribe the device with <code>deviceId</code> for push notifications from the repository with id <code>repoId</code>
+</li>
+</ul><p><code>DELETE /devices/:deviceId/repos/:repoId</code></p>
+
+<ul>
+<li>Unsubscribe the device with <code>deviceId</code> for push notifications from the repository with id <code>repoId</code>
+</li>
+</ul><p>The request payload for both the above endpoints with device and repo details:</p>
+
+<pre><code>{
+  "deviceId" : "Unique identifier",
+  "repo"     : {
+    "repoId" : "Travis-CI identifier for the repo (egs. 543678)",
+    "name"   : "Name of the repo (egs. floydpink/travis-notification-hub)"
+  }
+}
+</code></pre>
+
+<p><code>DELETE /devices/:deviceId/repos</code></p>
+
+<ul>
+<li>Unsubscribe all previously subscribed repositories</li>
+</ul><p>The request payload for this request just has the <code>deviceId</code>:</p>
+
+<pre><code>{
+  "deviceId" : "Unique identifier"
+}
+</code></pre>
+
+<p>For all the four endpoints above, the <code>deviceId</code> (and <code>repoId</code>, if applicable) in the payload should match the ones in the URL.</p>
+
+<h4>
+<a name="notifications" class="anchor" href="#notifications"><span class="octicon octicon-link"></span></a>Notifications</h4>
+
+<p>A notification from Travis-CI for every completed build along with their build status and repository id.</p>
+
+<p><code>POST /notifications</code></p>
+
+<ul>
+<li>Dispatch push notifications to all devices that have subscribed to the repository in the incoming notification</li>
+</ul><p>The request payload will have build status and the repo identifier and name:</p>
+
+<pre><code>{
+  "buildFailed" : false | true,
+  "repoId"      : "Travis-CI identifier for the repo (egs. 543678)",
+  "name"        : "Name of the repo (egs. floydpink/travis-notification-hub)"
+}
+</code></pre>
+
+<h3>
+<a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h3>
+
+<p>Run the tests using <code>npm test</code></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36383654-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
