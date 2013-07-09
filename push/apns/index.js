@@ -10,9 +10,11 @@ exports.push = function (deviceToken, message, badgeNumber, payload) {
   //debug('payload        : ', payload);
 
   var options = {
-        "gateway" : config.apns.gateway,
-        "cert"    : config.apns.cert,
-        "key"     : config.apns.key
+        "gateway"  : config.apns.gateway,
+        "cert"     : config.apns.cert,
+        "certData" : config.apns.certData,
+        "key"      : config.apns.key,
+        "keyData"  : config.apns.keyData
       },
       apnConnection = new apn.Connection(options),
       device = new apn.Device(deviceToken),

@@ -1,0 +1,21 @@
+var config = require('./config.global');
+
+config.env = 'production';
+config.hostname = 'travis-mobile-hub.herokuapp.com';
+
+//mongo
+config.mongo.uri = 'mongodb://' + process.env['MONGO_USER'] + ':' + process.env['MONGO_PWD'] +
+    '@dharma.mongohq.com:10007/' + process.env['HEROKU_APP_ID'];
+config.mongo.db = 'travis-hub';
+
+//gcms
+config.gcms.senderId = process.env['GCM_SENDER'];
+
+//apns
+config.apns.gateway = process.env['APNS_GATEWAY'];
+config.apns.cert = "";
+config.apns.certData = process.env['APNS_CERT'];
+config.apns.key = "";
+config.apns.keyData = process.env['APNS_KEY'];
+
+module.exports = config;
