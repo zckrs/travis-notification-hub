@@ -856,6 +856,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo001');
           repos[0].name.should.be.eql('floydpink/travis-notification-hub');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(5);
           repos[0].apnPushCount.should.be.eql(2);
           repos[0].gcmPushCount.should.be.eql(2);
@@ -869,6 +870,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(2);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
@@ -1013,6 +1015,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo001');
           repos[0].name.should.be.eql('floydpink/travis-notification-hub');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(3);
           repos[0].apnPushCount.should.be.eql(2);
           repos[0].gcmPushCount.should.be.eql(2);
@@ -1026,6 +1029,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(2);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
@@ -1126,6 +1130,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo001');
           repos[0].name.should.be.eql('floydpink/travis-notification-hub');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(2);
           repos[0].apnPushCount.should.be.eql(2);
           repos[0].gcmPushCount.should.be.eql(2);
@@ -1139,6 +1144,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(1);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
@@ -1221,7 +1227,7 @@ describe('hub tests: ', function () {
 
   describe('Routes  : Device       : put', function () {
     describe('\'devices/:deviceId\' with iOSDisabledDevice enabled', function () {
-      it('should update (200) with enabled = \'0\'', function (done) {
+      it('should update (200) with enabled = \'1\'', function (done) {
         var nowEnabledDevice = JSON.parse(JSON.stringify(iOSDisabledDevice));
         nowEnabledDevice.iOS.enabled = "1";
         request(url).
@@ -1528,6 +1534,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo001');
           repos[0].name.should.be.eql('floydpink/travis-notification-hub');
+          repos[0].lastBuildFailed.should.be.false;
           repos[0].devicesSubscribed.should.be.eql(3);
           repos[0].apnPushCount.should.be.eql(6);
           repos[0].gcmPushCount.should.be.eql(4);
@@ -1541,6 +1548,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
+          repos[0].lastBuildFailed.should.be.true;
           repos[0].devicesSubscribed.should.be.eql(2);
           repos[0].apnPushCount.should.be.eql(2);
           repos[0].gcmPushCount.should.be.eql(5);
