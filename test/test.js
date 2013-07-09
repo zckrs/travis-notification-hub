@@ -125,9 +125,10 @@ describe('hub tests: ', function () {
         }
       },
       androidDevice03 = {
-        "deviceId" : "Device06",
-        "name"     : "Android Device 06",
-        "platform" : "Android"
+        "deviceId"        : "Device06",
+        "name"            : "Android Device 06",
+        "platform"        : "Android",
+        "notifyAllBuilds" : true
       },
       repo01 = {
         "repoId" : "Repo001",
@@ -554,6 +555,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device02');
                   res.body.device.name.should.be.eql('iOS Device 02');
                   res.body.device.repos.length.should.be.eql(1);
@@ -570,6 +572,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device03');
                   res.body.device.name.should.be.eql('iOS Device 03');
                   res.body.device.repos.length.should.be.eql(1);
@@ -586,6 +589,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device04');
                   res.body.device.name.should.be.eql('Android Device 04');
                   res.body.device.repos.length.should.be.eql(1);
@@ -602,6 +606,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device05');
                   res.body.device.name.should.be.eql('Android Device 05');
                   res.body.device.repos.length.should.be.eql(1);
@@ -618,6 +623,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device04');
                   res.body.device.name.should.be.eql('Android Device 04');
                   res.body.device.repos.length.should.be.eql(2);
@@ -635,6 +641,7 @@ describe('hub tests: ', function () {
             end(function (err, res) {
                   if (err) { return done(err); }
                   res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device06');
                   res.body.device.name.should.be.eql('Android Device 06');
                   res.body.device.repos.length.should.be.eql(1);
@@ -656,6 +663,24 @@ describe('hub tests: ', function () {
                   res.body.device.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
+                  done();
+                });
+      });
+    });
+    describe('\'repos/:repoId\' with Device01 and repo02', function () {
+      it('should create (201)', function (done) {
+        request(url).
+            put('/api/devices/Device01/repos/Repo002').
+            send(createDeviceRepoPayload(iOSEnabledDevice01, repo02)).
+            end(function (err, res) {
+                  if (err) { return done(err); }
+                  res.should.have.status(201);
+                  res.body.status.should.be.eql('Repo subscribed');
+                  res.body.device.deviceId.should.be.eql('Device01');
+                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.repos.length.should.be.eql(2);
+                  res.body.device.repos.should.include('Repo001');
+                  res.body.device.repos.should.include('Repo002');
                   done();
                 });
       });
@@ -698,7 +723,7 @@ describe('hub tests: ', function () {
           repos.length.should.be.eql(1);
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
-          repos[0].devicesSubscribed.should.be.eql(2);
+          repos[0].devicesSubscribed.should.be.eql(3);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
           done();
@@ -811,8 +836,8 @@ describe('hub tests: ', function () {
                   res.body.status.should.include('Pushed build notifications for repo Repo001 to 2 Android and 2 iOS devices');
                   gcmNotifications.length.should.be.eql(2);
                   apnNotifications.length.should.be.eql(2);
-                  gcmNotifications[0].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000005');
-                  gcmNotifications[1].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000004');
+                  gcmNotifications[0].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000004');
+                  gcmNotifications[1].registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000005');
                   gcmNotifications[0].message.should.eql('Build passed: floydpink/travis-notification-hub');
                   gcmNotifications[1].message.should.eql('Build passed: floydpink/travis-notification-hub');
                   gcmNotifications[0].badgeNumber.should.eql(1);
@@ -871,7 +896,7 @@ describe('hub tests: ', function () {
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
           repos[0].lastBuildFailed.should.be.false;
-          repos[0].devicesSubscribed.should.be.eql(2);
+          repos[0].devicesSubscribed.should.be.eql(3);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
           done();
@@ -951,8 +976,9 @@ describe('hub tests: ', function () {
                   res.should.have.status(200);
                   res.body.device.deviceId.should.be.eql('Device01');
                   res.body.device.name.should.be.eql('Modified Device 01');
-                  res.body.device.repos.length.should.be.eql(0);
+                  res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.not.include('Repo001');
+                  res.body.device.repos.should.include('Repo002');
                   done();
                 });
       });
@@ -984,8 +1010,9 @@ describe('hub tests: ', function () {
                   res.body.status.should.be.eql('Device does not subscribe to this repo.');
                   res.body.device.deviceId.should.be.eql('Device01');
                   res.body.device.name.should.be.eql('Modified Device 01');
-                  res.body.device.repos.length.should.be.eql(0);
+                  res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.not.include('Repo001');
+                  res.body.device.repos.should.include('Repo002');
                   done();
                 });
       });
@@ -1030,7 +1057,7 @@ describe('hub tests: ', function () {
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
           repos[0].lastBuildFailed.should.be.false;
-          repos[0].devicesSubscribed.should.be.eql(2);
+          repos[0].devicesSubscribed.should.be.eql(3);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
           done();
@@ -1145,7 +1172,7 @@ describe('hub tests: ', function () {
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
           repos[0].lastBuildFailed.should.be.false;
-          repos[0].devicesSubscribed.should.be.eql(1);
+          repos[0].devicesSubscribed.should.be.eql(2);
           repos[0].apnPushCount.should.be.eql(0);
           repos[0].gcmPushCount.should.be.eql(0);
           done();
@@ -1172,13 +1199,17 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(200);
-                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 0 iOS devices');
+                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 1 iOS devices');
                   gcmNotifications.length.should.be.eql(1);
-                  apnNotifications.length.should.be.eql(0);
+                  apnNotifications.length.should.be.eql(1);
                   gcmNotifications[0].registrationId.should.eql('');
                   gcmNotifications[0].message.should.eql('Build failed: floydpink/Travis-CI');
                   gcmNotifications[0].badgeNumber.should.eql(1);
                   gcmNotifications[0].payload.should.eql({ repoId : 'Repo002'});
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
+                  apnNotifications[0].message.should.eql('Build failed: floydpink/Travis-CI');
+                  apnNotifications[0].badgeNumber.should.eql(2);
+                  apnNotifications[0].payload.should.eql({ repoId : 'Repo002'});
                   done();
                 });
       });
@@ -1192,13 +1223,17 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(200);
-                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 0 iOS devices');
+                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 1 iOS devices');
                   gcmNotifications.length.should.be.eql(1);
-                  apnNotifications.length.should.be.eql(0);
+                  apnNotifications.length.should.be.eql(1);
                   gcmNotifications[0].registrationId.should.eql('');
                   gcmNotifications[0].message.should.eql('Build fixed: floydpink/Travis-CI');
                   gcmNotifications[0].badgeNumber.should.eql(2);
                   gcmNotifications[0].payload.should.eql({ repoId : 'Repo002'});
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
+                  apnNotifications[0].message.should.eql('Build fixed: floydpink/Travis-CI');
+                  apnNotifications[0].badgeNumber.should.eql(3);
+                  apnNotifications[0].payload.should.eql({ repoId : 'Repo002'});
                   done();
                 });
       });
@@ -1212,13 +1247,17 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(200);
-                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 0 iOS devices');
+                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 1 iOS devices');
                   gcmNotifications.length.should.be.eql(1);
-                  apnNotifications.length.should.be.eql(0);
+                  apnNotifications.length.should.be.eql(1);
                   gcmNotifications[0].registrationId.should.eql('');
                   gcmNotifications[0].message.should.eql('Build passed: floydpink/Travis-CI');
                   gcmNotifications[0].badgeNumber.should.eql(3);
                   gcmNotifications[0].payload.should.eql({ repoId : 'Repo002'});
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
+                  apnNotifications[0].message.should.eql('Build passed: floydpink/Travis-CI');
+                  apnNotifications[0].badgeNumber.should.eql(4);
+                  apnNotifications[0].payload.should.eql({ repoId : 'Repo002'});
                   done();
                 });
       });
@@ -1337,17 +1376,21 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(200);
-                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 1 iOS devices');
+                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 2 iOS devices');
                   gcmNotifications.length.should.be.eql(1);
-                  apnNotifications.length.should.be.eql(1);
+                  apnNotifications.length.should.be.eql(2);
                   gcmNotifications[0].registrationId.should.eql('POUIPOUIQWERTYKBHVHKKK*^%%GJBJJBVHVHVHV');
                   gcmNotifications[0].message.should.eql('Build failed: floydpink/Travis-CI');
                   gcmNotifications[0].badgeNumber.should.eql(1);
                   gcmNotifications[0].payload.should.eql({ repoId : 'Repo002'});
-                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
                   apnNotifications[0].message.should.eql('Build failed: floydpink/Travis-CI');
-                  apnNotifications[0].badgeNumber.should.eql(1);
+                  apnNotifications[0].badgeNumber.should.eql(5);
                   apnNotifications[0].payload.should.eql({ repoId : 'Repo002'});
+                  apnNotifications[1].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
+                  apnNotifications[1].message.should.eql('Build failed: floydpink/Travis-CI');
+                  apnNotifications[1].badgeNumber.should.eql(1);
+                  apnNotifications[1].payload.should.eql({ repoId : 'Repo002'});
                   done();
                 });
       });
@@ -1361,17 +1404,21 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(200);
-                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 1 iOS devices');
+                  res.body.status.should.include('Pushed build notifications for repo Repo002 to 1 Android and 2 iOS devices');
                   gcmNotifications.length.should.be.eql(1);
-                  apnNotifications.length.should.be.eql(1);
+                  apnNotifications.length.should.be.eql(2);
                   gcmNotifications[0].registrationId.should.eql('POUIPOUIQWERTYKBHVHKKK*^%%GJBJJBVHVHVHV');
                   gcmNotifications[0].message.should.eql('Still failing: floydpink/Travis-CI');
                   gcmNotifications[0].badgeNumber.should.eql(2);
                   gcmNotifications[0].payload.should.eql({ repoId : 'Repo002'});
-                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
+                  apnNotifications[0].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
                   apnNotifications[0].message.should.eql('Still failing: floydpink/Travis-CI');
-                  apnNotifications[0].badgeNumber.should.eql(2);
+                  apnNotifications[0].badgeNumber.should.eql(6);
                   apnNotifications[0].payload.should.eql({ repoId : 'Repo002'});
+                  apnNotifications[1].deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
+                  apnNotifications[1].message.should.eql('Still failing: floydpink/Travis-CI');
+                  apnNotifications[1].badgeNumber.should.eql(2);
+                  apnNotifications[1].payload.should.eql({ repoId : 'Repo002'});
                   done();
                 });
       });
@@ -1456,9 +1503,10 @@ describe('hub tests: ', function () {
         findDevice({ deviceId : iOSEnabledDevice01.deviceId }, function (devices) {
           devices.length.should.be.eql(1);
           devices[0].deviceId.should.be.eql('Device01');
-          devices[0].repos.length.should.be.eql(0);
-          devices[0].pushCount.should.be.eql(1);
-          devices[0].badgeCount.should.be.eql(1);
+          devices[0].repos.length.should.be.eql(1);
+          devices[0].repos.should.include('Repo002');
+          devices[0].pushCount.should.be.eql(6);
+          devices[0].badgeCount.should.be.eql(6);
           done();
         });
       });
@@ -1549,8 +1597,8 @@ describe('hub tests: ', function () {
           repos[0].repoId.should.be.eql('Repo002');
           repos[0].name.should.be.eql('floydpink/Travis-CI');
           repos[0].lastBuildFailed.should.be.true;
-          repos[0].devicesSubscribed.should.be.eql(2);
-          repos[0].apnPushCount.should.be.eql(2);
+          repos[0].devicesSubscribed.should.be.eql(3);
+          repos[0].apnPushCount.should.be.eql(7);
           repos[0].gcmPushCount.should.be.eql(5);
           done();
         });
