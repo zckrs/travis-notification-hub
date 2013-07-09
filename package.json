@@ -12,10 +12,13 @@
     "node-gcm"    : "~0.9.6"
   },
   "devDependencies" : {
-    "mocha"      : "0.3.x",
-    "should"     : "~1.2.2",
-    "supertest"  : "~0.7.1",
-    "proxyquire" : "~0.4.1"
+    "mocha"            : "0.3.x",
+    "should"           : "~1.2.2",
+    "supertest"        : "~0.7.1",
+    "proxyquire"       : "~0.4.1",
+    "node-rest-client" : "~0.1.1",
+    "async"            : "~0.2.9",
+    "progress"         : "~1.0.0"
   },
   "repository"      : {
     "type" : "git",
