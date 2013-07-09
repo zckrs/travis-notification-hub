@@ -1,16 +1,18 @@
 var mongoose = require('mongoose'),
     deviceSchema = new mongoose.Schema({
                                          deviceId        : { type : String, unique : true, required : true },
-                                         name            : { type : String, default : '' },
-                                         platform        : { type : String, required : true },
                                          notifyAllBuilds : { type : Boolean, default : false},
+                                         phonegapDevice  : {
+                                           name     : { type : String, default : ''},
+                                           platform : { type : String, required : true },
+                                           cordova  : { type : String, default : ''},
+                                           version  : { type : String, default : ''},
+                                           model    : { type : String, default : ''}
+                                         },
                                          android         : {
                                            registrationId : { type : String, default : '' }
                                          },
                                          iOS             : {
-                                           pushBadge   : { type : String, default : '' },
-                                           pushSound   : { type : String, default : '' },
-                                           pushAlert   : { type : String, default : '' },
                                            enabled     : { type : String, default : '' },
                                            deviceToken : { type : String, default : '' }
                                          },

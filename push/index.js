@@ -54,7 +54,7 @@ exports.notify = function (build, callback) {
 
           devices.forEach(function (device) {
             var newBadgeCount = device.badgeCount + 1;
-            if (device.platform.toLowerCase() === 'android') {
+            if (device.phonegapDevice.platform.toLowerCase() === 'android') {
               gcmDevices.push({ regId : device.android.registrationId, badge : newBadgeCount });
             } else {
               if (device.iOS.enabled === '1') {

@@ -73,61 +73,64 @@ describe('hub tests: ', function () {
         };
       },
       iOSEnabledDevice01 = {
-        "deviceId" : "Device01",
-        "name"     : "iOS Device 01",
-        "platform" : "iOS",
-        "iOS"      : {
-          "pushBadge"   : "1",
-          "pushSound"   : "1",
-          "pushAlert"   : "1",
+        "deviceId"       : "Device01",
+        "phonegapDevice" : {
+          "platform" : "iOS",
+          "name"     : "iOS Device 01"
+        },
+        "iOS"            : {
           "enabled"     : "1",
           "deviceToken" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001"
         }
       },
       iOSEnabledDevice02 = {
-        "deviceId" : "Device02",
-        "name"     : "iOS Device 02",
-        "platform" : "iOS",
-        "iOS"      : {
-          "pushBadge"   : "1",
-          "pushSound"   : "1",
-          "pushAlert"   : "1",
+        "deviceId"       : "Device02",
+        "phonegapDevice" : {
+          "platform" : "iOS",
+          "name"     : "iOS Device 02"
+        },
+        "iOS"            : {
           "enabled"     : "1",
           "deviceToken" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000002"
         }
       },
       iOSDisabledDevice = {
-        "deviceId" : "Device03",
-        "name"     : "iOS Device 03",
-        "platform" : "iOS",
-        "iOS"      : {
-          "pushBadge"   : "1",
-          "pushSound"   : "1",
-          "pushAlert"   : "1",
+        "deviceId"       : "Device03",
+        "phonegapDevice" : {
+          "platform" : "iOS",
+          "name"     : "iOS Device 03"
+        },
+        "iOS"            : {
           "enabled"     : "0",
           "deviceToken" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003"
         }
       },
       androidDevice01 = {
-        "deviceId" : "Device04",
-        "name"     : "Android Device 04",
-        "platform" : "Android",
-        "android"  : {
+        "deviceId"       : "Device04",
+        "phonegapDevice" : {
+          "platform" : "Android",
+          "name"     : "Android Device 04"
+        },
+        "android"        : {
           "registrationId" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000004"
         }
       },
       androidDevice02 = {
-        "deviceId" : "Device05",
-        "name"     : "Android Device 05",
-        "platform" : "Android",
-        "android"  : {
+        "deviceId"       : "Device05",
+        "phonegapDevice" : {
+          "platform" : "Android",
+          "name"     : "Android Device 05"
+        },
+        "android"        : {
           "registrationId" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000005"
         }
       },
       androidDevice03 = {
         "deviceId"        : "Device06",
-        "name"            : "Android Device 06",
-        "platform"        : "Android",
+        "phonegapDevice"  : {
+          "platform" : "Android",
+          "name"     : "Android Device 06"
+        },
         "notifyAllBuilds" : true
       },
       repo01 = {
@@ -261,7 +264,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.include('Registered new device');
                   res.body.device.deviceId.should.eql('Device01');
-                  res.body.device.name.should.eql('iOS Device 01');
+                  res.body.device.phonegapDevice.name.should.eql('iOS Device 01');
                   res.body.device.repos.should.eql([]);
                   res.body.device.iOS.deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
                   done();
@@ -271,7 +274,7 @@ describe('hub tests: ', function () {
     describe('\'devices/:deviceId\' with modified iOSDevice01', function () {
       it('should update (200)', function (done) {
         var modifiedDevice = JSON.parse(JSON.stringify(iOSEnabledDevice01));
-        modifiedDevice.name = 'Modified Device 01';
+        modifiedDevice.phonegapDevice.name = 'Modified Device 01';
         request(url).
             put('/api/devices/Device01').
             send(modifiedDevice).
@@ -280,7 +283,7 @@ describe('hub tests: ', function () {
                   res.should.be.json;
                   res.should.have.status(200);
                   res.body.status.should.include('Updated existing device');
-                  res.body.device.name.should.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.eql('Modified Device 01');
                   res.body.device.created.should.not.eql(res.body.device.updated);
                   res.body.device.iOS.deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000001');
                   done();
@@ -298,7 +301,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.include('Registered new device');
                   res.body.device.deviceId.should.eql('Device02');
-                  res.body.device.name.should.eql('iOS Device 02');
+                  res.body.device.phonegapDevice.name.should.eql('iOS Device 02');
                   res.body.device.repos.should.eql([]);
                   res.body.device.iOS.deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000002');
                   done();
@@ -317,8 +320,8 @@ describe('hub tests: ', function () {
                   res.body.device.should.have.property('iOS');
                   res.body.device.iOS.should.have.property('enabled');
                   res.body.device.deviceId.should.eql('Device03');
-                  res.body.device.name.should.eql('iOS Device 03');
-                  res.body.device.platform.should.eql('iOS');
+                  res.body.device.phonegapDevice.name.should.eql('iOS Device 03');
+                  res.body.device.phonegapDevice.platform.should.eql('iOS');
                   res.body.device.repos.should.eql([]);
                   res.body.device.iOS.deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
                   res.body.device.iOS.enabled.should.eql('0');
@@ -336,14 +339,12 @@ describe('hub tests: ', function () {
                   res.should.be.json;
                   res.should.have.status(201);
                   res.body.device.should.have.property('deviceId');
-                  res.body.device.should.have.property('name');
-                  res.body.device.should.have.property('platform');
+                  res.body.device.should.have.property('phonegapDevice');
+                  res.body.device.phonegapDevice.should.have.property('name');
+                  res.body.device.phonegapDevice.should.have.property('platform');
                   res.body.device.should.have.property('iOS');
                   res.body.device.iOS.should.have.property('deviceToken');
                   res.body.device.iOS.should.have.property('enabled');
-                  res.body.device.iOS.should.have.property('pushAlert');
-                  res.body.device.iOS.should.have.property('pushBadge');
-                  res.body.device.iOS.should.have.property('pushSound');
                   res.body.device.should.have.property('android');
                   res.body.device.android.should.have.property('registrationId');
                   res.body.device.should.have.property('badgeCount');
@@ -352,8 +353,8 @@ describe('hub tests: ', function () {
                   res.body.device.should.have.property('created');
                   res.body.device.should.have.property('updated');
                   res.body.device.deviceId.should.eql('Device04');
-                  res.body.device.name.should.eql('Android Device 04');
-                  res.body.device.platform.should.eql('Android');
+                  res.body.device.phonegapDevice.name.should.eql('Android Device 04');
+                  res.body.device.phonegapDevice.platform.should.eql('Android');
                   res.body.device.repos.should.eql([]);
                   res.body.device.android.registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000004');
                   done();
@@ -369,8 +370,8 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.be.json;
                   res.should.have.status(201);
-                  res.body.device.name.should.eql('Android Device 05');
-                  res.body.device.platform.should.eql('Android');
+                  res.body.device.phonegapDevice.name.should.eql('Android Device 05');
+                  res.body.device.phonegapDevice.platform.should.eql('Android');
                   res.body.device.repos.should.eql([]);
                   res.body.device.android.registrationId.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000005');
                   done();
@@ -387,14 +388,12 @@ describe('hub tests: ', function () {
                   res.should.be.json;
                   res.should.have.status(201);
                   res.body.device.should.have.property('deviceId');
-                  res.body.device.should.have.property('name');
-                  res.body.device.should.have.property('platform');
+                  res.body.device.should.have.property('phonegapDevice');
+                  res.body.device.phonegapDevice.should.have.property('name');
+                  res.body.device.phonegapDevice.should.have.property('platform');
                   res.body.device.should.have.property('iOS');
                   res.body.device.iOS.should.have.property('deviceToken');
                   res.body.device.iOS.should.have.property('enabled');
-                  res.body.device.iOS.should.have.property('pushAlert');
-                  res.body.device.iOS.should.have.property('pushBadge');
-                  res.body.device.iOS.should.have.property('pushSound');
                   res.body.device.should.have.property('android');
                   res.body.device.android.should.have.property('registrationId');
                   res.body.device.should.have.property('badgeCount');
@@ -403,8 +402,8 @@ describe('hub tests: ', function () {
                   res.body.device.should.have.property('created');
                   res.body.device.should.have.property('updated');
                   res.body.device.deviceId.should.eql('Device06');
-                  res.body.device.name.should.eql('Android Device 06');
-                  res.body.device.platform.should.eql('Android');
+                  res.body.device.phonegapDevice.name.should.eql('Android Device 06');
+                  res.body.device.phonegapDevice.platform.should.eql('Android');
                   res.body.device.repos.should.eql([]);
                   res.body.device.android.registrationId.should.eql('');
                   done();
@@ -432,7 +431,7 @@ describe('hub tests: ', function () {
     });
     describe('iOS devices', function () {
       it('should be 3', function (done) {
-        findDevice({ platform : 'iOS' }, function (devices) {
+        findDevice({ "phonegapDevice.platform" : 'iOS' }, function (devices) {
           devices.length.should.be.eql(3);
           done();
         });
@@ -443,7 +442,7 @@ describe('hub tests: ', function () {
         findDevice(
             {
               $and : [
-                { platform : 'iOS' },
+                { "phonegapDevice.platform" : 'iOS' },
                 { "iOS.enabled" : '1' }
               ]
             },
@@ -455,7 +454,7 @@ describe('hub tests: ', function () {
     });
     describe('Android devices', function () {
       it('should be 3', function (done) {
-        findDevice({ platform : 'Android' }, function (devices) {
+        findDevice({ "phonegapDevice.platform" : 'Android' }, function (devices) {
           devices.length.should.be.eql(3);
           done();
         });
@@ -540,7 +539,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device01');
-                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -557,7 +556,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device02');
-                  res.body.device.name.should.be.eql('iOS Device 02');
+                  res.body.device.phonegapDevice.name.should.be.eql('iOS Device 02');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -574,7 +573,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device03');
-                  res.body.device.name.should.be.eql('iOS Device 03');
+                  res.body.device.phonegapDevice.name.should.be.eql('iOS Device 03');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -591,7 +590,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device04');
-                  res.body.device.name.should.be.eql('Android Device 04');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 04');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -608,7 +607,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device05');
-                  res.body.device.name.should.be.eql('Android Device 05');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 05');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -625,7 +624,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device04');
-                  res.body.device.name.should.be.eql('Android Device 04');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 04');
                   res.body.device.repos.length.should.be.eql(2);
                   res.body.device.repos.should.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
@@ -643,7 +642,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device06');
-                  res.body.device.name.should.be.eql('Android Device 06');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 06');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo002');
                   done();
@@ -660,7 +659,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(200);
                   res.body.status.should.be.eql('Device already subscribes to this repo.');
                   res.body.device.deviceId.should.be.eql('Device01');
-                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   done();
@@ -677,7 +676,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(201);
                   res.body.status.should.be.eql('Repo subscribed');
                   res.body.device.deviceId.should.be.eql('Device01');
-                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(2);
                   res.body.device.repos.should.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
@@ -959,7 +958,7 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.have.status(200);
                   res.body.device.deviceId.should.be.eql('Device01');
-                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.not.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
@@ -976,7 +975,7 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.have.status(200);
                   res.body.device.deviceId.should.be.eql('Device05');
-                  res.body.device.name.should.be.eql('Android Device 05');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 05');
                   res.body.device.repos.length.should.be.eql(0);
                   res.body.device.repos.should.not.include('Repo001');
                   done();
@@ -993,7 +992,7 @@ describe('hub tests: ', function () {
                   res.should.have.status(200);
                   res.body.status.should.be.eql('Device does not subscribe to this repo.');
                   res.body.device.deviceId.should.be.eql('Device01');
-                  res.body.device.name.should.be.eql('Modified Device 01');
+                  res.body.device.phonegapDevice.name.should.be.eql('Modified Device 01');
                   res.body.device.repos.length.should.be.eql(1);
                   res.body.device.repos.should.not.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
@@ -1108,7 +1107,7 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.have.status(200);
                   res.body.device.deviceId.should.be.eql('Device04');
-                  res.body.device.name.should.be.eql('Android Device 04');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 04');
                   res.body.device.repos.length.should.be.eql(0);
                   res.body.device.repos.should.not.include('Repo001');
                   res.body.device.repos.should.not.include('Repo002');
@@ -1259,8 +1258,8 @@ describe('hub tests: ', function () {
                   res.body.device.should.have.property('iOS');
                   res.body.device.iOS.should.have.property('enabled');
                   res.body.device.deviceId.should.eql('Device03');
-                  res.body.device.name.should.eql('iOS Device 03');
-                  res.body.device.platform.should.eql('iOS');
+                  res.body.device.phonegapDevice.name.should.eql('iOS Device 03');
+                  res.body.device.phonegapDevice.platform.should.eql('iOS');
                   res.body.device.repos.length.should.eql(1);
                   res.body.device.repos.should.include('Repo001');
                   res.body.device.iOS.deviceToken.should.eql('ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890000003');
@@ -1282,14 +1281,12 @@ describe('hub tests: ', function () {
                   res.should.be.json;
                   res.should.have.status(200);
                   res.body.device.should.have.property('deviceId');
-                  res.body.device.should.have.property('name');
-                  res.body.device.should.have.property('platform');
+                  res.body.device.should.have.property('phonegapDevice');
+                  res.body.device.phonegapDevice.should.have.property('name');
+                  res.body.device.phonegapDevice.should.have.property('platform');
                   res.body.device.should.have.property('iOS');
                   res.body.device.iOS.should.have.property('deviceToken');
                   res.body.device.iOS.should.have.property('enabled');
-                  res.body.device.iOS.should.have.property('pushAlert');
-                  res.body.device.iOS.should.have.property('pushBadge');
-                  res.body.device.iOS.should.have.property('pushSound');
                   res.body.device.should.have.property('android');
                   res.body.device.android.should.have.property('registrationId');
                   res.body.device.should.have.property('badgeCount');
@@ -1298,8 +1295,8 @@ describe('hub tests: ', function () {
                   res.body.device.should.have.property('created');
                   res.body.device.should.have.property('updated');
                   res.body.device.deviceId.should.eql('Device06');
-                  res.body.device.name.should.eql('Android Device 06');
-                  res.body.device.platform.should.eql('Android');
+                  res.body.device.phonegapDevice.name.should.eql('Android Device 06');
+                  res.body.device.phonegapDevice.platform.should.eql('Android');
                   res.body.device.repos.length.should.eql(1);
                   res.body.device.repos.should.include('Repo002');
                   res.body.device.android.registrationId.should.eql('POUIPOUIQWERTYKBHVHKKK*^%%GJBJJBVHVHVHV');
@@ -1319,7 +1316,7 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.have.status(201);
                   res.body.device.deviceId.should.be.eql('Device03');
-                  res.body.device.name.should.be.eql('iOS Device 03');
+                  res.body.device.phonegapDevice.name.should.be.eql('iOS Device 03');
                   res.body.device.repos.length.should.be.eql(2);
                   res.body.device.repos.should.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
@@ -1336,7 +1333,7 @@ describe('hub tests: ', function () {
                   if (err) { return done(err); }
                   res.should.have.status(201);
                   res.body.device.deviceId.should.be.eql('Device06');
-                  res.body.device.name.should.be.eql('Android Device 06');
+                  res.body.device.phonegapDevice.name.should.be.eql('Android Device 06');
                   res.body.device.repos.length.should.be.eql(2);
                   res.body.device.repos.should.include('Repo001');
                   res.body.device.repos.should.include('Repo002');
