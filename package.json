@@ -1,7 +1,7 @@
 {
   "name"            : "travis-notification-hub",
   "description"     : "A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.",
-  "version"         : "0.0.5",
+  "version"         : "0.1.0",
   "private"         : true,
   "dependencies"    : {
     "debug"       : "~0.7.2",
