@@ -15,18 +15,20 @@ var load = 10000,
       "name"   : "floydpink/travis-notification-hub"
     },
     deviceTemplate = {
-      "deviceId" : "Device-",
-      "name"     : "Test Device-",
-      "platform" : "iOS"
+      "deviceId"     : "Device-",
+      "name"         : "Test Device-",
+      phonegapDevice : {
+        "platform" : "iOS"
+      }
     },
     createDeviceRepoPayload = function (device, i) {
       return {
         deviceId : device.deviceId,
-        repo     : repos[ i % (load/2) ]
+        repo     : repos[ i % (load / 2) ]
       };
     },
     loadDevicesAndRepos = function () {
-      for (var i = 1; i <= (load/2); i++) {
+      for (var i = 1; i <= (load / 2); i++) {
         var repo = JSON.parse(JSON.stringify(repoTemplate));
         repo.repoId += i;
         repo.name += i;
