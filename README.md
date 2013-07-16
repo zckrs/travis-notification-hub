@@ -97,3 +97,7 @@ Just so I could earn some bragging rights, please endorse me on coderwall!
 [![endorse](https://api.coderwall.com/floydpink/endorsecount.png)](https://coderwall.com/floydpink)
 
 [![githalytics.com alpha](https://cruel-carlota.gopagoda.com/67fe97666dd7b901a453ee7792e81e74 "githalytics.com")](http://githalytics.com/floydpink/travis-notification-hub)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/floydpink/travis-notification-hub/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
