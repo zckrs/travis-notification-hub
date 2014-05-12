@@ -3,7 +3,7 @@ travis-notification-hub
 
 A node.js RESTful service that serves as a middle-tier hub for dispatching Travis-CI build notifications to Android and iOS applications.
 
-[![Build Status](https://travis-ci.org/floydpink/travis-notification-hub.svg?branch=heroku-deploy)](https://travis-ci.org/floydpink/travis-notification-hub)
+[![Build Status](https://travis-ci.org/floydpink/travis-notification-hub.svg?branch=master)](https://travis-ci.org/floydpink/travis-notification-hub)
 
 ### Travis Notification Hub API
 
